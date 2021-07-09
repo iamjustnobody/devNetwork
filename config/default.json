@@ -1,0 +1,3 @@
+{
+    "mongoURI":"mongodb+srv://Mern0Admin:Mern0AdminPwd@devconnector.h9n02.mongodb.net/testDatabase?retryWrites=true&w=majority"
+}
