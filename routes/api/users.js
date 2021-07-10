@@ -5,8 +5,13 @@ const {body,validationResult}=require('express-validator');
 const gravatar=require('gravatar');
 const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
+//const config=require('../../config/default.json')
+const config=require('config');
 
 const User=require('../../models/UserModel')
+
+//test GET api/users
+//router.get('/',(req,res)=>{res.send('User route');})
 
 
 //@route POST api/users for registeration
@@ -46,9 +51,21 @@ router.post('/',
         await user.save();
         //console.log(user.id,typeof user.id,user._id,typeof user._id)//string obj
 
-        //return jwt
+        //res.send('User registered');
 
-        res.send('User registered');
+        //return jwt
+        const payload={
+            userid:user._id,
+            user:{
+                id:user.id
+            }
+        }
+        jwt.sign(payload,config.get('jwtSecret'),{expiresIn:3600},(err,token)=>{
+            if(err)throw err;
+            return res.status(200).json({token}) //or res.json({token}) //return opt
+        }) //an hour
+
+        //res.send('User registered');
 
     }catch(err){
         console.error(err.message);
