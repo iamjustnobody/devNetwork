@@ -70,7 +70,7 @@ router.post(
 
         try{
             let profile=await Profile.findOne({userid:req.user.id})
-            if(profile){//UPDATE
+            if(profile){//UPDATE - amendnp
                 profile=await Profile.findOneAndUpdate({userid:req.user.id},{$set:profileFields},{new:true});
                 return res.json(profile) //or return res.status(200).json({profile}) //must have 'return' for res
             }
@@ -143,5 +143,36 @@ router.delete('/',authmw,async(req,res)=>{
     }
 })
 
+
+//PUT api/profile/experience --- ADD experience to authorised/loggedin user profile/experience
+//protected routes (authmw)
+//like GET api/profile/me & POST api/profile & DELETE api/profile
+router.put(
+    '/experience',
+    authmw,
+    [
+        body('title','Title is required').not().isEmpty(),
+        body('company','Company is required').not().isEmpty(),
+        body('from','From Date is required').not().isEmpty()
+    ],
+    async(req,res)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty)return res.status(400).json({errors:errors.array()});
+
+        const {title,company,location,from,to,current,description}=req.body;
+        const newExp={title,company,location,from,to,current,description};
+
+    try {
+
+        const profile=await Profile.findOne({userid:req.user.id});
+        profile.experience.unshift(newExp);
+        await profile.save(); //findAndUpdate
+
+        res.json(profile);//res.json({profile}); return & status opt
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error')
+    }
+})
 
 module.exports=router;
