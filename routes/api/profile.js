@@ -268,4 +268,135 @@ router.put(
     }
 })
 
+
+
+
+
+
+
+
+//copy & paste the above exprience for education
+//PUT api/profile/education --- ADD education to authorised/loggedin user profile/education
+//protected routes (authmw)
+router.put(
+    '/education',
+    authmw,
+    [
+        body('school','School is required').not().isEmpty(),
+        body('degree','Degree is required').not().isEmpty(),
+        body('major','Major is required').not().isEmpty()
+    ],
+    async(req,res)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty)return res.status(400).json({errors:errors.array()});
+
+        const {school,degree,major,from,to,current,description}=req.body;
+        const newEdu={school,degree,major,from,to,current,description};
+
+    try {
+        const newProfile=await Profile.findOneAndUpdate(
+            {userid:req.user.id},
+            {$push:{"education":newEdu}},
+            {new:true});
+        res.json(newProfile);//res.json({newProfile}); return & status opt 
+        //above 1 ok
+
+        //const profile=await Profile.findOne({userid:req.user.id});
+        /*
+        profile.education.unshift(newEdu);
+        await profile.save(); 
+        res.json(profile);//res.json({profile}); return & status opt */ //2 ok
+
+        //findAndUpdate
+        //const newProfEdu=profile.education.unshift(newEdu);
+        //alreay changed to current array profile.education //return integer
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error')
+    }
+})
+
+//DELETE api/profile/education/:edu_id --- delete education to authorised/loggedin user profile/education
+//protected routes (authmw) //could be PUT req
+router.delete(
+    '/education/:edu_id',
+    authmw,
+    async(req,res)=>{
+    try {
+        const profile=await Profile.findOne({userid:req.user.id}); //for 1 2 3
+        //get remove index
+        const removeIndex=profile.education.map(_edu=>_edu._id).indexOf(req.params.edu_id)// 1 ok
+        //_edu=>_edu._id or _edu.id both ok
+
+        //profile.education.splice(removeIndex,1); //1 ok for these above
+
+       //profile.education.filter(_edu=>_edu.id!=req.params.edu_id) 
+       //no changes to current profile or profile.education; return newarray
+       //profile.education=profile.education.filter(_edu=>_edu.id!=req.params.edu_id) //2 ok
+       //_edu.id!=req.params.edu_id or _edu._id!=req.params.edu_id both ok
+
+     //   await profile.save(); //for 1 & 2
+     //res.json(profile);//res.json({profile}); return & status opt
+
+     
+      const profEdu=profile.education.filter(_edu=>_edu.id!=req.params.edu_id) 
+      //_edu.id!=req.params.edu_id or _edu._id!=req.params.edu_id both ok
+      //console.log(profEdu.length) 
+      const newProf=await Profile.findOneAndUpdate(
+          {userid:req.user.id},{"education": profEdu},{new:true}
+          ) //{$set: {"education": profEdu}} //$set for multiple fields updates
+        res.json(newProf); //3 ok
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error')
+    }
+})
+
+
+router.put(
+    '/education/:edu_id',
+    authmw,
+    [
+        body('title','Title is required').not().isEmpty(),
+        body('company','Company is required').not().isEmpty(),
+        body('from','From Date is required').not().isEmpty()
+    ],
+    async(req,res)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty)return res.status(400).json({errors:errors.array()});
+
+        const {school,degree,major,from,to,current,description}=req.body;
+        const updatedEdu={school,degree,major,from,to,current,description};
+
+    try {
+
+        const profile=await Profile.findOne({userid:req.user.id});//for 1 2
+        /*
+        const updatedProfEdu=profile.education.map(_edu=>{
+            if(_edu.id==req.params.edu_id)return updatedEdu;
+            return _edu;
+        }) //_edu.id or _edu._id //for 2a 2b
+        const updatedProf=await Profile.findOneAndUpdate({userid:req.user.id},{$set:{"education":updatedProfEdu}},{new:true})//2a
+        //const updatedProf=await Profile.findOneAndUpdate({userid:req.user.id},{"education":updatedProfEdu},{new:true}) //2b
+        //both ok 2a 2b
+        res.json(updatedProf);//res.json({updatedProf}); return & status opt
+         */// 2a 2b ok
+        
+        profile.education=profile.education.map(_edu=>{
+            if(_edu._id==req.params.edu_id)return updatedEdu;
+            return _edu;
+        })//_edu._id==req.params.edu_id or _edu.id==req.params.edu_id
+        await profile.save(); //1 ok
+        res.json(profile);//res.json({profile}); return & status opt 
+        
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error')
+    }
+})
+
+
+
 module.exports=router;
