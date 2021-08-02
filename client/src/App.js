@@ -27,11 +27,14 @@ function App() {
 }*/
 
 const App=()=>
-  
+  <Router>
     <Fragment>
       <Navbar />
-      <Landing />
-  </Fragment>
+      <Route exact path='/' component={Landing} />
+    </Fragment>
+  </Router>
   
 
 export default App;
+//<Fragment><Navbar /><Landing /></Fragment>   <div><Navbar /><Landing /></div> 
+//<Router><Fragment><Navbar /><Landing /></Fragment></Router> == <Router><Fragment><Navbar /><Route exact path='/' component={Landing} /></Fragment></Router>
