@@ -1,6 +1,9 @@
 import logo from './logo.svg';
 import './App.css';
 import { Fragment } from 'react';
+import { Navbar } from './components/layout/Navbar';
+import { Landing } from './components/layout/Landing';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 /*
 function App() {
   return (
@@ -24,8 +27,11 @@ function App() {
 }*/
 
 const App=()=>
-  <Fragment>
-    <h1>App</h1>
+  
+    <Fragment>
+      <Navbar />
+      <Landing />
   </Fragment>
+  
 
 export default App;
