@@ -10,9 +10,6 @@ const config=require('config');
 
 const User=require('../../models/UserModel')
 
-//test GET api/users
-//router.get('/',(req,res)=>{res.send('User route');})
-
 
 //@route POST api/users for registeration
 router.post('/',
@@ -25,7 +22,6 @@ router.post('/',
     if(!errors.isEmpty()){
         return res.status(400).json({errors:errors.array()});
     }
-    console.log(req.body); //user email for registration 
 
     const {name,email,password}=req.body;
     try{
@@ -47,11 +43,7 @@ router.post('/',
         const salt=await bcrypt.genSalt(10);
         user.password=await bcrypt.hash(password,salt);
 
-        //console.log(user.id,typeof user.id,user._id,typeof user._id)//string obj
         await user.save();
-        //console.log(user.id,typeof user.id,user._id,typeof user._id)//string obj
-
-        //res.send('User registered');
 
         //return jwt
         const payload={
