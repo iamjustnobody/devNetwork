@@ -30,7 +30,7 @@ const App=()=>
   <Router>
     <Fragment>
       <Navbar />
-      <Route exact path='/' component={} />
+      <Route exact path='/' component={Landing} />
     </Fragment>
   </Router>
   
